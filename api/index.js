@@ -1,13 +1,28 @@
-import express from "express";
-import cors from "cors";
+// api/index.js
 
-import testDb from "../src/routes/test-db.js";
+import express from 'express';
+import cors from 'cors';
+
+// Import your test route (adjust path if needed)
+import testDbHandler from '../src/routes/test-db.js';  // ← check this path
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-app.use("/api/test-db", testDb);
+// Mount the test-db route
+app.use('/api/test-db', testDbHandler);
 
+// Optional: root health check (prevents default Vercel 404 page)
+app.get('/', (req, res) => {
+  res.json({
+    status: 'online',
+    message: 'DistroHub Backend API is running on Vercel',
+    timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || 'production'
+  });
+});
+
+// Required for Vercel serverless
 export default app;
