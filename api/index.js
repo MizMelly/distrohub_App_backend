@@ -64,5 +64,15 @@ app.use((err, req, res, next) => {
   });
 });
 
+console.log('[START] api/index.js loaded');
+console.log('[ENV] DATABASE_URL exists:', !!process.env.DATABASE_URL);
+console.log('[ENV] JWT_SECRET exists:', !!process.env.JWT_SECRET);
+
+// In each route mount (example for test-db)
+app.use('/api/test-db', (req, res, next) => {
+  console.log('[TEST-DB] Request incoming');
+  testDbHandler(req, res, next);
+});
+
 // Export the app for Vercel serverless functions
 export default app;
