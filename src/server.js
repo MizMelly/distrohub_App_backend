@@ -5,6 +5,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+const testDbRoute = require('./routes/test-db');
 const authRoutes = require('./routes/auth');
 const productsRoutes = require('./routes/products');
 const ordersRoutes = require('./routes/orders');
@@ -25,6 +26,7 @@ app.use('/products', productsRoutes);
 app.use('/orders', ordersRoutes);
 app.use('/orders-history', ordersHistoryRoutes);
 app.use('/bank-accounts', bankAccountsRoutes);;
+app.use('/api/test-db', testDbRoute);
 // app.use('/api/products', productsRoutes);
 
 // Root route
