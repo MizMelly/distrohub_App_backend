@@ -1,28 +1,43 @@
 // api/index.js
 
-import express from 'express';
-import cors from 'cors';
+const express = require('express');
+const cors = require('cors');
+const helmet = require('helmet');
+const morgan = require('morgan');
 
-// Import your test route (adjust path if needed)
-import testDbHandler from '../src/routes/test-db.js';  // ← check this path
+// Import your route modules (from routes/ folder)
+const authRoutes = require('../routes/auth');
+const productsRoutes = require('../routes/products');
+const ordersRoutes = require('../routes/orders');
+const ordersHistoryRoutes = require('../routes/orders-history');
+const bankAccountsRoutes = require('../routes/bank-accounts');
+const testDbRoute = require('../routes/test-db');
 
+// Create the Express app
 const app = express();
 
+// Middleware
+app.use(helmet());
+app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 
-// Mount the test-db route
-app.use('/api/test-db', testDbHandler);
+// Mount all your routes under /api prefix
+app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/orders', ordersRoutes);
+app.use('/api/orders-history', ordersHistoryRoutes);
+app.use('/api/bank-accounts', bankAccountsRoutes);
+app.use('/api/test-db', testDbRoute);
 
-// Optional: root health check (prevents default Vercel 404 page)
+// Optional root route (for basic health check at /)
 app.get('/', (req, res) => {
   res.json({
     status: 'online',
     message: 'DistroHub Backend API is running on Vercel',
     timestamp: new Date().toISOString(),
-    env: process.env.NODE_ENV || 'production'
   });
 });
 
-// Required for Vercel serverless
-export default app;
+// Export the app for Vercel serverless
+module.exports = app;
