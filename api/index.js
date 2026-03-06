@@ -1,43 +1,43 @@
 // api/index.js
 
-const express = require('express');
-const cors = require('cors');
-const helmet = require('helmet');
-const morgan = require('morgan');
+import express from "express";
+import cors from "cors";
 
-// Import your route modules (from routes/ folder)
-const authRoutes = require('../routes/auth');
-const productsRoutes = require('../routes/products');
-const ordersRoutes = require('../routes/orders');
-const ordersHistoryRoutes = require('../routes/orders-history');
-const bankAccountsRoutes = require('../routes/bank-accounts');
-const testDbRoute = require('../routes/test-db');
+// Import all routes
+import authRoutes from "../src/routes/auth.js";
+import productsRoutes from "../src/routes/products.js";
+import ordersRoutes from "../src/routes/orders.js";
+import ordersHistoryRoutes from "../src/routes/orders-history.js";
+import bankAccountsRoutes from "../src/routes/bank-accounts.js";
+import testDbHandler from "../src/routes/test-db.js";
 
-// Create the Express app
 const app = express();
 
-// Middleware
-app.use(helmet());
-app.use(morgan('dev'));
 app.use(cors());
 app.use(express.json());
 
-// Mount all your routes under /api prefix
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/orders', ordersRoutes);
-app.use('/api/orders-history', ordersHistoryRoutes);
-app.use('/api/bank-accounts', bankAccountsRoutes);
-app.use('/api/test-db', testDbRoute);
+/*
+  IMPORTANT:
+  Vercel already serves everything under /api
+  so DO NOT add /api again here
+*/
 
-// Optional root route (for basic health check at /)
-app.get('/', (req, res) => {
+// Mount routes
+app.use("/auth", authRoutes);
+app.use("/products", productsRoutes);
+app.use("/orders", ordersRoutes);
+app.use("/orders-history", ordersHistoryRoutes);
+app.use("/bank-accounts", bankAccountsRoutes);
+app.use("/test-db", testDbHandler);
+
+// Health check
+app.get("/", (req, res) => {
   res.json({
-    status: 'online',
-    message: 'DistroHub Backend API is running on Vercel',
+    status: "online",
+    message: "DistroHub Backend API is running on Vercel",
     timestamp: new Date().toISOString(),
+    env: process.env.NODE_ENV || "production"
   });
 });
 
-// Export the app for Vercel serverless
-module.exports = app;
+export default app;
