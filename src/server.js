@@ -20,11 +20,11 @@ app.use(cors());
 app.use(express.json());
 
 // Mount routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productsRoutes);
-app.use('/api/orders', ordersRoutes);
-app.use('/api/orders-history', ordersHistoryRoutes);
-app.use('/api/bank-accounts', bankAccountsRoutes);
+app.use('/auth', authRoutes);
+app.use('/products', productsRoutes);
+app.use('/orders', ordersRoutes);
+app.use('/orders-history', ordersHistoryRoutes);
+app.use('/bank-accounts', bankAccountsRoutes);;
 // app.use('/api/products', productsRoutes);
 
 // Root route
