@@ -5,7 +5,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-// Import all your route handlers from src/routes/
+// Import route handlers (adjust paths if your folder structure is different)
 import testDbHandler from '../src/routes/test-db.js';
 import authRoutes from '../src/routes/auth.js';
 import productsRoutes from '../src/routes/products.js';
@@ -17,17 +17,22 @@ import uploadRoutes from '../src/routes/upload.js';
 const app = express();
 
 // Middleware
-app.use(helmet());              // security headers
-app.use(morgan('dev'));         // logging
+app.use(helmet());                  // Security headers
+app.use(morgan('dev'));             // Request logging
 app.use(cors({
-  origin: '*',                  // allow all for now (tighten later for production)
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*',                      // Allow all for development (change to your Flutter web URL in production)
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: true
 }));
 app.use(express.json());
 
 // Mount all routes under /api prefix
-app.use('/api/test-db', testDbHandler);
+app.use('/api/test-db', (req, res, next) => {
+  console.log('[TEST-DB] Request incoming:', req.method, req.originalUrl);
+  testDbHandler(req, res, next);
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/orders', ordersRoutes);
@@ -35,7 +40,7 @@ app.use('/api/orders-history', ordersHistoryRoutes);
 app.use('/api/bank-accounts', bankAccountsRoutes);
 app.use('/api/upload', uploadRoutes);
 
-// Root route (prevents default Vercel 404 page)
+// Root route (prevents Vercel default 404 page)
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'online',
@@ -47,7 +52,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// Global 404 handler for unmatched routes
+// 404 handler for unmatched routes
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -55,24 +60,19 @@ app.use((req, res) => {
   });
 });
 
-// Global error handler (prevents crashes in serverless)
+// Global error handler (prevents silent crashes in serverless)
 app.use((err, req, res, next) => {
-  console.error('Server error:', err.stack);
+  console.error('[SERVER ERROR]', err.stack);
   res.status(500).json({
     error: 'Internal Server Error',
-    message: 'Something went wrong on the server'
+    message: err.message || 'Something went wrong on the server'
   });
 });
 
+// Startup logs (visible in Vercel Functions logs)
 console.log('[START] api/index.js loaded');
 console.log('[ENV] DATABASE_URL exists:', !!process.env.DATABASE_URL);
 console.log('[ENV] JWT_SECRET exists:', !!process.env.JWT_SECRET);
 
-// In each route mount (example for test-db)
-app.use('/api/test-db', (req, res, next) => {
-  console.log('[TEST-DB] Request incoming');
-  testDbHandler(req, res, next);
-});
-
-// Export the app for Vercel serverless functions
+// Export for Vercel serverless functions
 export default app;
