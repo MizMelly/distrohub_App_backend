@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { query, getClient } = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+
+import { query } from '../config/db.js';
+import { verifyToken } from '../middleware/auth.js';
 
 // Helper for debug logs
 const debugLog = (message, data = null) => {
@@ -69,7 +70,7 @@ router.get('/', verifyToken, async (req, res) => {
 });
 
 // =====================
-// GET ORDER DETAILS (with items)
+// GET ORDER DETAILS (with items & payments)
 // =====================
 router.get('/:orderNo', verifyToken, async (req, res) => {
   const { orderNo } = req.params;
@@ -170,5 +171,6 @@ router.get('/:orderNo', verifyToken, async (req, res) => {
     });
   }
 });
+
 
 export default router;

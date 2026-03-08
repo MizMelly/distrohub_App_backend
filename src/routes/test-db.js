@@ -1,5 +1,4 @@
-// routes/test-db.js
-const { Pool } = require('pg');
+import { Pool } from 'pg';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -7,7 +6,7 @@ const pool = new Pool({
   connectionTimeoutMillis: 15000,
 });
 
-module.exports = async function handler(req, res) {
+export default async function handler(req, res) {
   console.log('[TEST-DB] Request received');
   console.log('[TEST-DB] DATABASE_URL exists:', !!process.env.DATABASE_URL);
 
@@ -16,7 +15,7 @@ module.exports = async function handler(req, res) {
     console.log('[TEST-DB] Connected!');
 
     const result = await client.query('SELECT NOW() as time, current_database() as db');
-    
+
     res.status(200).json({
       success: true,
       message: 'Connected to Neon Postgres',
@@ -32,9 +31,8 @@ module.exports = async function handler(req, res) {
     res.status(500).json({
       success: false,
       error: err.message,
-      code: err.code || 'unknown'
+      code: err.code || 'unknown',
+      stack: err.stack 
     });
   }
-};
-
-export default router;
+}

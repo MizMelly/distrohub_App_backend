@@ -1,6 +1,8 @@
-const express = require('express');
+
+import express from 'express';
 const router = express.Router();
-const { query } = require('../config/db');
+
+import { query } from '../config/db.js';
 
 // Helper for debug logs (consistent style)
 const debugLog = (message, data = null) => {
@@ -12,6 +14,9 @@ const debugLog = (message, data = null) => {
   }
 };
 
+// =====================
+// GET ALL PRODUCTS
+// =====================
 router.get('/', async (req, res) => {
   const startTime = Date.now();
 
@@ -94,5 +99,6 @@ router.get('/', async (req, res) => {
     });
   }
 });
+
 
 export default router;

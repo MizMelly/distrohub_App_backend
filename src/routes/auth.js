@@ -1,12 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+// src/routes/auth.js – FULL ESM VERSION
 
-const { verifyToken } = require('../middleware/auth');
-const { query } = require('../config/db');
+import express from 'express';
+const router = express.Router();
+
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+import crypto from 'crypto';
+
+import { verifyToken } from '../middleware/auth.js';
+import { query } from '../config/db.js';
 
 // Helper for debug logs
 const debugLog = (message, data = null) => {

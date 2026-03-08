@@ -1,7 +1,10 @@
-const express = require('express');
+// routes/bank-accounts.js – FULL ESM (no require, no module.exports)
+
+import express from 'express';
 const router = express.Router();
-const { query } = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+
+import { query } from '../config/db.js';
+import { verifyToken } from '../middleware/auth.js';
 
 // =====================
 // GET BANK ACCOUNTS
@@ -28,5 +31,6 @@ router.get('/', verifyToken, async (req, res) => {
     });
   }
 });
+
 
 export default router;

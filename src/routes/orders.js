@@ -1,7 +1,8 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const { query, getClient } = require('../config/db');
-const { verifyToken } = require('../middleware/auth');
+
+import { query, getClient } from '../config/db.js';
+import { verifyToken } from '../middleware/auth.js';
 
 // Helper for debug logs
 const debugLog = (message, data = null) => {
