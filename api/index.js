@@ -14,6 +14,16 @@ import uploadRoutes from '../src/routes/upload.js';
 
 const app = express();
 
+app.get('/api/debug', (req, res) => {
+  res.json({
+    message: 'This is the debug route - backend is executing!',
+    time: new Date().toISOString(),
+    env: {
+      DATABASE_URL: !!process.env.DATABASE_URL,
+      JWT_SECRET: !!process.env.JWT_SECRET
+    }
+  });
+});
 // Middleware – MUST be before routes
 app.use(express.json());           // Parses JSON bodies – fixes "req.body undefined"
 app.use(express.urlencoded({ extended: true })); // Optional: parses form data
