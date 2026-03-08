@@ -3,7 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-// Import all route handlers (adjust paths if your folder structure differs)
+// Import all route handlers (adjust paths if needed)
 import testDbHandler from '../src/routes/test-db.js';
 import authRoutes from '../src/routes/auth.js';
 import productsRoutes from '../src/routes/products.js';
@@ -14,17 +14,17 @@ import uploadRoutes from '../src/routes/upload.js';
 
 const app = express();
 
-// Middleware
-app.use(helmet());                  // Security headers
-app.use(morgan('dev'));             // Request logging
+// Middleware – MUST be before routes
+app.use(express.json());           // Parses JSON bodies – fixes "req.body undefined"
+app.use(express.urlencoded({ extended: true })); // Optional: parses form data
+app.use(helmet());
+app.use(morgan('dev'));
 app.use(cors({
-  origin: '*',                      // Allow all for development (change to your Flutter app URL in production)
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true
 }));
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // Mount all routes under /api prefix
 app.use('/api/test-db', testDbHandler);
@@ -47,7 +47,7 @@ app.get('/', (req, res) => {
   });
 });
 
-// 404 handler for unmatched routes
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     error: 'Not Found',
@@ -55,19 +55,19 @@ app.use((req, res) => {
   });
 });
 
-// Global error handler (prevents silent crashes in serverless)
+// Global error handler
 app.use((err, req, res, next) => {
   console.error('[SERVER ERROR]', err.stack);
   res.status(500).json({
     error: 'Internal Server Error',
-    message: err.message || 'Something went wrong on the server'
+    message: err.message || 'Something went wrong'
   });
 });
 
-// Startup logs (visible in Vercel Functions logs)
+// Startup logs
 console.log('[START] api/index.js loaded');
 console.log('[ENV] DATABASE_URL exists:', !!process.env.DATABASE_URL);
 console.log('[ENV] JWT_SECRET exists:', !!process.env.JWT_SECRET);
 
-// Export for Vercel serverless functions
+// Export
 export default app;
