@@ -1,5 +1,11 @@
-const { Pool } = require('pg');
-require('dotenv').config();
+import { Pool } from 'pg';
+
+// Load dotenv only in development (Vercel injects env vars automatically in production)
+if (process.env.NODE_ENV !== 'production') {
+  import('dotenv').then(({ default: dotenv }) => {
+    dotenv.config();
+  }).catch(err => console.error('[DB] Failed to load dotenv in dev mode:', err));
+}
 
 // Debug: Show what env vars are loaded
 console.log('[DB INIT] Loaded DATABASE_URL:', process.env.DATABASE_URL || 'NOT SET');
@@ -7,14 +13,17 @@ console.log('[DB INIT] Any old DB_NAME?', process.env.DB_NAME || 'none');
 console.log('[DB INIT] Current working dir:', process.cwd());
 
 if (!process.env.DATABASE_URL) {
-  console.error('[DB FATAL] DATABASE_URL missing - check .env file path or dotenv config');
-  process.exit(1);
+  console.error('[DB FATAL] DATABASE_URL missing - check Vercel env vars or .env file');
+  // In production (Vercel) we don't exit, but log heavily
+  if (process.env.NODE_ENV !== 'production') {
+    process.exit(1);
+  }
 }
 
 // Allow overriding connection timeout via env, default to 10s
 const connectionTimeoutMillis = parseInt(process.env.DB_CONN_TIMEOUT_MS, 10) || 10000;
 
-// Enable SSL for remote hosts (Render, AWS, etc.) unless explicitly disabled
+// Enable SSL for remote hosts (Render, Neon, AWS, etc.) unless explicitly disabled
 const dbUrl = process.env.DATABASE_URL || '';
 const isLocalhost = /localhost|127\.0\.0\.1/.test(dbUrl);
 const useSsl = process.env.DB_SSL === 'false' ? false : !isLocalhost;
@@ -36,7 +45,7 @@ console.log('[DB INIT] Pool config:', {
 
 const pool = new Pool(poolConfig);
 
-// Test connection immediately
+// Test connection immediately (async IIFE)
 (async () => {
   try {
     const client = await pool.connect();
@@ -46,10 +55,9 @@ const pool = new Pool(poolConfig);
     client.release();
   } catch (err) {
     console.error('[DB TEST FAIL] Connection failed:', err.message);
-    // show helpful debug info
     console.error('[DB TEST FAIL] Error name/code:', err.name, err.code || 'no-code');
     console.error('[DB TEST FAIL] Full stack:', err.stack);
-    console.error('[DB TEST FAIL] Pool waiting count / total count not exposed here — check network, host/port, and DB credentials.');
+    console.error('[DB TEST FAIL] Check: network, host/port, credentials, SSL settings.');
   }
 })();
 
@@ -57,7 +65,10 @@ pool.on('error', (err) => {
   console.error('[DB ERROR] Idle client error:', err.message);
 });
 
-module.exports = {
-  query: (text, params) => pool.query(text, params),
-  getClient: () => pool.connect(),
-};
+
+export const query = (text, params) => pool.query(text, params);
+
+export const getClient = () => pool.connect();
+
+
+export { pool };
