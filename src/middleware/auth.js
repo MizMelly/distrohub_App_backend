@@ -1,21 +1,47 @@
-const jwt = require('jsonwebtoken');
-require('dotenv').config();
+// src/middleware/auth.js – ESM with named export 'verifyToken'
 
-const verifyToken = (req, res, next) => {
+import jwt from 'jsonwebtoken';
+
+export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  const token = authHeader && authHeader.split(' ')[1];
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({
+      success: false,
+      message: 'No token provided or invalid format. Use "Bearer <token>"',
+    });
+  }
+
+  const token = authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ message: 'No token provided' });
+    return res.status(401).json({
+      success: false,
+      message: 'Token not found in header',
+    });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret-change-this-in-production'
+    );
+
+    req.user = decoded; // attach user data to req.user for route handlers
     next();
-  } catch (error) {
-    return res.status(403).json({ message: 'Invalid or expired token' });
+  } catch (err) {
+    console.error('[AUTH MIDDLEWARE] Token verification failed:', err.message);
+
+    if (err.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Token has expired',
+      });
+    }
+
+    return res.status(401).json({
+      success: false,
+      message: 'Invalid token',
+    });
   }
 };
-
-module.exports = { verifyToken };
