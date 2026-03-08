@@ -36,3 +36,5 @@ module.exports = async function handler(req, res) {
     });
   }
 };
+
+export default router;

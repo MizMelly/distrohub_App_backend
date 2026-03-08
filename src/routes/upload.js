@@ -81,4 +81,4 @@ router.post('/', verifyToken, upload.single('payment_proof'), async (req, res) =
   }
 });
 
-module.exports = router;
+export default router;
