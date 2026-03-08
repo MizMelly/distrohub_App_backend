@@ -25,8 +25,8 @@ app.get('/api/debug', (req, res) => {
   });
 });
 // Middleware – MUST be before routes
-app.use(express.json());           // Parses JSON bodies – fixes "req.body undefined"
-app.use(express.urlencoded({ extended: true })); // Optional: parses form data
+app.use(express.json());           
+app.use(express.urlencoded({ extended: true })); 
 app.use(helmet());
 app.use(morgan('dev'));
 app.use(cors({
