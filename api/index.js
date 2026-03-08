@@ -1,18 +1,16 @@
-// api/index.js
-
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import morgan from 'morgan';
 
-// Import route handlers (adjust paths if your folder structure is different)
+// Import all route handlers (adjust paths if your folder structure differs)
 import testDbHandler from '../src/routes/test-db.js';
 import authRoutes from '../src/routes/auth.js';
-// import productsRoutes from '../src/routes/products.js';
-// import ordersRoutes from '../src/routes/orders.js';
-// import ordersHistoryRoutes from '../src/routes/orders-history.js';
-// import bankAccountsRoutes from '../src/routes/bank-accounts.js';
-// import uploadRoutes from '../src/routes/upload.js';
+import productsRoutes from '../src/routes/products.js';
+import ordersRoutes from '../src/routes/orders.js';
+import ordersHistoryRoutes from '../src/routes/orders-history.js';
+import bankAccountsRoutes from '../src/routes/bank-accounts.js';
+import uploadRoutes from '../src/routes/upload.js';
 
 const app = express();
 
@@ -20,29 +18,24 @@ const app = express();
 app.use(helmet());                  // Security headers
 app.use(morgan('dev'));             // Request logging
 app.use(cors({
-  origin: '*',                      // Allow all for development (change to your Flutter web URL in production)
+  origin: '*',                      // Allow all for development (change to your Flutter app URL in production)
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Mount all routes under /api prefix
-app.use('/api/test-db', (req, res, next) => {
-  console.log('[TEST-DB] Request incoming:', req.method, req.originalUrl);
-  testDbHandler(req, res, next);
-});
-
 app.use('/api/test-db', testDbHandler);
 app.use('/api/auth', authRoutes);
+app.use('/api/products', productsRoutes);
+app.use('/api/orders', ordersRoutes);
+app.use('/api/orders-history', ordersHistoryRoutes);
+app.use('/api/bank-accounts', bankAccountsRoutes);
+app.use('/api/upload', uploadRoutes);
 
-// app.use('/api/products', productsRoutes);
-// app.use('/api/orders', ordersRoutes);
-// app.use('/api/orders-history', ordersHistoryRoutes);
-// app.use('/api/bank-accounts', bankAccountsRoutes);
-// app.use('/api/upload', uploadRoutes);
-
-// Root route (prevents Vercel default 404 page)
+// Root route (prevents default Vercel 404 page)
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'online',
