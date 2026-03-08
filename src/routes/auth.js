@@ -1,5 +1,3 @@
-// src/routes/auth.js – FULL ESM VERSION
-
 import express from 'express';
 const router = express.Router();
 
@@ -8,8 +6,16 @@ import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
-import { verifyToken } from '../middleware/auth.js';
 import { query } from '../config/db.js';
+
+// Create nodemailer transporter (use env vars from Vercel)
+const transporter = nodemailer.createTransport({
+  service: 'gmail', // or your SMTP service
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS, 
+  },
+});
 
 // Helper for debug logs
 const debugLog = (message, data = null) => {
@@ -266,5 +272,6 @@ router.get('/profile', verifyToken, async (req, res) => {
     });
   }
 });
+
 
 export default router;
