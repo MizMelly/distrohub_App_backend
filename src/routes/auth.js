@@ -1,13 +1,15 @@
 import express from 'express';
-const router = express.Router();
+
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
-import crypto from 'crypto';
+ 
 
+import { verifyToken } from '../middleware/auth.js';
 import { query } from '../config/db.js';
 
+const router = express.Router();
 // Create nodemailer transporter (use env vars from Vercel)
 const transporter = nodemailer.createTransport({
   service: 'gmail', // or your SMTP service
