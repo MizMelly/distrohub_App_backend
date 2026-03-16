@@ -1,5 +1,3 @@
-// src/middleware/auth.js – ESM with named export 'verifyToken'
-
 import jwt from 'jsonwebtoken';
 
 export const verifyToken = (req, res, next) => {

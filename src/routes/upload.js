@@ -1,8 +1,16 @@
-const express = require('express');
-const router = express.Router();
-const multer = require('multer');
-const path = require('path');
+// src/routes/upload.js
+import express from 'express';
+import multer from 'multer';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+import { verifyToken } from '../middleware/auth.js'; // make sure this path is correct
 
+const router = express.Router();
+
+// __dirname replacement for ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Helper for debug logs
 const debugLog = (message, data = null) => {
@@ -14,7 +22,7 @@ const debugLog = (message, data = null) => {
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    // Save to public/uploads directory
+    // Save to public/uploads/payment_proofs directory
     const uploadDir = path.join(__dirname, '../../public/uploads/payment_proofs');
     cb(null, uploadDir);
   },
@@ -29,9 +37,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB max
-  },
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB max
   fileFilter: (req, file, cb) => {
     // Only allow image files
     const allowedMimes = ['image/jpeg', 'image/png', 'image/jpg'];
